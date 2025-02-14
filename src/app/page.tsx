@@ -20,6 +20,8 @@ export default function Home() {
   
   const [filter, setFilter] = useState({ sort: "none" });
 
+  
+
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="flex items-baseline justify-between border-b-2 border-gray-300 pb-6 pt-24">
