@@ -8,6 +8,12 @@ import { ChevronDown, Filter } from "lucide-react";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { QueryResult } from "@upstash/vector";
+import type { Product as TProduct } from "@/db";
+import Product from "@/components/Products/Product";
+import ProductSkeleton from "@/components/Products/ProductSkeleton";
 
 // CONSTANT VALUES
 const SORT_OPTIONS = [
@@ -17,10 +23,25 @@ const SORT_OPTIONS = [
 ] as const;
 
 export default function Home() {
-  
   const [filter, setFilter] = useState({ sort: "none" });
 
-  
+  // reading data
+  const { data: products } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data } = await axios.post<QueryResult<TProduct>[]>(
+        "http://localhost:3000/api/products",
+        {
+          filter: {
+            sort: filter.sort,
+          },
+        }
+      );
+      return data;
+    },
+  });
+
+  console.log(products);
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -59,6 +80,26 @@ export default function Home() {
           </button>
         </div>
       </div>
+
+      <section className="pb-24 pt-10">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+          {/* Filters */}
+          <div>
+
+          </div>
+
+          {/* Product Grid */}
+          <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 ">
+            {products
+              ? products.map((item,index) => (
+                  <Product key={index} product={item.metadata!} />
+                ))
+              : new Array(12)
+                  .fill(null)
+                  .map((_, i) => <ProductSkeleton key={i} />)}
+          </ul>
+        </div>
+      </section>
     </main>
   );
 }
