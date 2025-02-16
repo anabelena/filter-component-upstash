@@ -3,15 +3,22 @@
 import {
   DropdownMenu,
   DropdownMenuTrigger,
+  DropdownMenuContent
 } from "@/components/ui/dropdown-menu";
+
 import { ChevronDown, Filter } from "lucide-react";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+
 import { useQuery } from "@tanstack/react-query";
+
 import axios from "axios";
+
 import { QueryResult } from "@upstash/vector";
+
 import type { Product as TProduct } from "@/db";
+
 import Product from "@/components/Products/Product";
 import ProductSkeleton from "@/components/Products/ProductSkeleton";
 
@@ -23,6 +30,7 @@ const SORT_OPTIONS = [
 ] as const;
 
 export default function Home() {
+
   const [filter, setFilter] = useState({ sort: "none" });
 
   // reading data
@@ -45,13 +53,17 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
       <div className="flex items-baseline justify-between border-b-2 border-gray-300 pb-6 pt-24">
+        
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-          High-quality selection
+         High-Quality Selection 
         </h1>
 
         <div className="flex items-center">
+
           <DropdownMenu>
+
             <DropdownMenuTrigger className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
               Sort
               <ChevronDown className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
@@ -81,15 +93,17 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="pb-24 pt-10">
+      <section className="pt-10 pb-24 ">
+
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
           {/* Filters */}
-          <div>
+          {/* Hidden en movil, tablet etc y aparece en Desktop */}
+          <div className="hidden lg:block">
 
           </div>
 
           {/* Product Grid */}
-          <ul className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 ">
+          <ul className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3  ">
             {products
               ? products.map((item,index) => (
                   <Product key={index} product={item.metadata!} />
