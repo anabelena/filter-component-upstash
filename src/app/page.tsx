@@ -3,7 +3,7 @@
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-  DropdownMenuContent
+  DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 
 import { ChevronDown, Filter } from "lucide-react";
@@ -21,6 +21,13 @@ import type { Product as TProduct } from "@/db";
 
 import Product from "@/components/Products/Product";
 import ProductSkeleton from "@/components/Products/ProductSkeleton";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ProductState } from "@/lib/validators/product-validator";
 
 // CONSTANT VALUES
 const SORT_OPTIONS = [
@@ -29,11 +36,41 @@ const SORT_OPTIONS = [
   { name: "Price: High to Low", value: "price-des" },
 ] as const;
 
+const COLOR_FILTERS = {
+  id: "color",
+  name: "Color",
+  options: [
+    { value: "white", label: "White" },
+    { value: "beige", label: "Beige" },
+    { value: "blue", label: "Blue" },
+    { value: "green", label: "Greeen" },
+    { value: "purple", label: "Purple" },
+  ],
+} as const;
+
+const SUBCATEGORIES = [
+  { name: "T-Shirts", selected: true, href: "#" },
+  { name: "Hoodes", selected: false, href: "#" },
+  { name: "Sweatshirts", selected: false, href: "#" },
+  { name: "Accessories", selected: false, href: "#" },
+] as const;
+
+const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
+
 export default function Home() {
 
-  const [filter, setFilter] = useState({ sort: "none" });
+  const [filter, setFilter] = useState<ProductState>(
+    {
+      color: ["beige", "blue", "green", "purple", "white"],
+      price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE }, //omit
+      size: ["L", "M", "S"],
+      sort: "none",
+    } //omit
+  );
 
-  // reading data
+  console.log("filter usestate",filter);
+
+  // READING DATA
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -49,21 +86,38 @@ export default function Home() {
     },
   });
 
-  console.log(products);
+  const applyArrayFilter = ({
+    category,
+    value,
+  }: {
+    category: keyof Omit<typeof filter, "price" | "sort">;
+    value: string;
+  }) => {
+
+    const isFilterApplied = filter[category].includes(value as never);
+
+    if (isFilterApplied) {
+      setFilter((prev) => ({
+        ...prev,
+        [category]: prev[category].filter((v) => v !== value),
+      }));
+    } else {
+      setFilter((prev) => ({
+        ...prev,
+        [category]: [...prev[category], value],
+      }));
+    }
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
       <div className="flex items-baseline justify-between border-b-2 border-gray-300 pb-6 pt-24">
-        
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-         High-Quality Selection 
+          High-Quality Selection
         </h1>
 
         <div className="flex items-center">
-
           <DropdownMenu>
-
             <DropdownMenuTrigger className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
               Sort
               <ChevronDown className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
@@ -94,23 +148,68 @@ export default function Home() {
       </div>
 
       <section className="pt-10 pb-24 ">
-
+        {/* FILTER GRID */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
           {/* Filters */}
-          {/* Hidden en movil, tablet etc y aparece en Desktop */}
           <div className="hidden lg:block">
+            <ul className="space-y-4 border-b border-gray-400 pb-6 text-sm font-medium text-gray-900">
+              {SUBCATEGORIES.map((category) => (
+                <li key={category.name}>
+                  <button
+                    disabled={!category.selected}
+                    className="disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
+            <Accordion type="multiple" className="animate-none">
+              {/* Color Filter */}
+              <AccordionItem value="color">
+                <AccordionTrigger className="py-3 text-sm text-gray-400 hover:text-gray-500">
+                  <span className="font-medium text-gray-900"> Color </span>
+                </AccordionTrigger>
+                <AccordionContent className="pt-6 animate-none">
+                  <ul className="space-y-4">
+                    {COLOR_FILTERS.options.map((option, optionIdx) => (
+                      <li key={option.value} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`color-${optionIdx}`}
+                          onChange={() => {
+                            applyArrayFilter({
+                              category: "color",
+                              value: option.value,
+                            });
+                          }}
+                          checked={filter.color.includes(option.value)}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 "
+                        />
+                        <label
+                          htmlFor={`color-${optionIdx}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          {option.label}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
-          {/* Product Grid */}
-          <ul className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3  ">
+          {/* PRODUCT Grid */}
+          <ul className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3 ">
             {products
-              ? products.map((item,index) => (
+              ? products.map((item, index) => (
                   <Product key={index} product={item.metadata!} />
                 ))
-              : new Array(12)
-                  .fill(null)
-                  .map((_, i) => <ProductSkeleton key={i} />)}
+              : Array.from({ length: 12 }, (_, i) => (
+                  <ProductSkeleton key={i} />
+                ))}
           </ul>
         </div>
       </section>
