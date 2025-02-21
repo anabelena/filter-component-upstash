@@ -6,30 +6,26 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 
-import { ChevronDown, Filter } from "lucide-react";
-
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-
-import { useQuery } from "@tanstack/react-query";
-
-import axios from "axios";
-
-import { QueryResult } from "@upstash/vector";
-
-import type { Product as TProduct } from "@/db";
-
-import Product from "@/components/Products/Product";
-import ProductSkeleton from "@/components/Products/ProductSkeleton";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ProductState } from "@/lib/validators/product-validator";
 
-// CONSTANT VALUES
+import Product from "@/components/Products/Product";
+import ProductSkeleton from "@/components/Products/ProductSkeleton";
+import { ProductState } from "@/lib/validators/product-validator";
+import { useState } from "react";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { QueryResult } from "@upstash/vector";
+import type { Product as TProduct } from "@/db";
+import { cn } from "@/lib/utils";
+
+import { ChevronDown, Filter } from "lucide-react";
+
+
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
   { name: "Price: Low to High", value: "price-asc" },
@@ -57,18 +53,19 @@ const SUBCATEGORIES = [
 
 const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
 
+
 export default function Home() {
 
   const [filter, setFilter] = useState<ProductState>(
     {
+      size: ["S","M","L"],
       color: ["beige", "blue", "green", "purple", "white"],
-      price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE }, //omit
-      size: ["L", "M", "S"],
       sort: "none",
-    } //omit
+      price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE }, 
+    } 
   );
 
-  console.log("filter usestate",filter);
+  console.log("Filter useState",filter);
 
   // READING DATA
   const { data: products } = useQuery({
