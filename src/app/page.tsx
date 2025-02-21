@@ -29,7 +29,7 @@ import { ChevronDown, Filter } from "lucide-react";
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
   { name: "Price: Low to High", value: "price-asc" },
-  { name: "Price: High to Low", value: "price-des" },
+  { name: "Price: High to Low", value: "price-desc" },
 ] as const;
 
 const COLOR_FILTERS = {
@@ -83,13 +83,7 @@ export default function Home() {
     },
   });
 
-  const applyArrayFilter = ({
-    category,
-    value,
-  }: {
-    category: keyof Omit<typeof filter, "price" | "sort">;
-    value: string;
-  }) => {
+  const applyArrayFilter = ({category,value}:{category: keyof Omit<typeof filter, "price" | "sort">, value: string}) => {
 
     const isFilterApplied = filter[category].includes(value as never);
 
@@ -130,8 +124,7 @@ export default function Home() {
                   })}
                   onClick={() => {
                     setFilter((prev) => ({ ...prev, sort: option.value }));
-                  }}
-                >
+                  }}>
                   {option.name}
                 </button>
               ))}
