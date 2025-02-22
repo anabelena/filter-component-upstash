@@ -107,6 +107,7 @@ export default function Home() {
           High-Quality Selection
         </h1>
 
+        {/* SORT OPTIONS */}
         <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -125,7 +126,8 @@ export default function Home() {
                   onClick={() => {
                     setFilter((prev) => ({ ...prev, sort: option.value }));
                   }}>
-                  {option.name}
+                  {/* none, low to high , high to low  */}
+                  {option.name} 
                 </button>
               ))}
             </DropdownMenuContent>
