@@ -24,12 +24,19 @@ import type { Product as TProduct } from "@/db";
 import { cn } from "@/lib/utils";
 
 import { ChevronDown, Filter } from "lucide-react";
-
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
   { name: "Price: Low to High", value: "price-asc" },
   { name: "Price: High to Low", value: "price-desc" },
+] as const;
+
+const SUBCATEGORIES = [
+  { name: "T-Shirts", selected: true, href: "#" },
+  { name: "Hoodes", selected: false, href: "#" },
+  { name: "Sweatshirts", selected: false, href: "#" },
+  { name: "Accessories", selected: false, href: "#" },
 ] as const;
 
 const COLOR_FILTERS = {
@@ -44,28 +51,27 @@ const COLOR_FILTERS = {
   ],
 } as const;
 
-const SUBCATEGORIES = [
-  { name: "T-Shirts", selected: true, href: "#" },
-  { name: "Hoodes", selected: false, href: "#" },
-  { name: "Sweatshirts", selected: false, href: "#" },
-  { name: "Accessories", selected: false, href: "#" },
-] as const;
+const SIZE_FILTERS = {
+  id: "size",
+  name: "Size",
+  options: [
+    { value: "S", label: "S" },
+    { value: "M", label: "M" },
+    { value: "L", label: "L" },
+  ],
+} as const;
 
 const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
 
-
 export default function Home() {
+  const [filter, setFilter] = useState<ProductState>({
+    size: ["S", "M", "L"],
+    color: ["beige", "blue", "green", "purple", "white"],
+    sort: "none",
+    price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE },
+  });
 
-  const [filter, setFilter] = useState<ProductState>(
-    {
-      size: ["S","M","L"],
-      color: ["beige", "blue", "green", "purple", "white"],
-      sort: "none",
-      price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE }, 
-    } 
-  );
-
-  console.log("Filter useState",filter);
+  console.log("Filter useState", filter);
 
   // READING DATA
   const { data: products } = useQuery({
@@ -83,8 +89,13 @@ export default function Home() {
     },
   });
 
-  const applyArrayFilter = ({category,value}:{category: keyof Omit<typeof filter, "price" | "sort">, value: string}) => {
-
+  const applyArrayFilter = ({
+    category,
+    value,
+  }: {
+    category: keyof Omit<typeof filter, "price" | "sort">;
+    value: string;
+  }) => {
     const isFilterApplied = filter[category].includes(value as never);
 
     if (isFilterApplied) {
@@ -125,9 +136,10 @@ export default function Home() {
                   })}
                   onClick={() => {
                     setFilter((prev) => ({ ...prev, sort: option.value }));
-                  }}>
+                  }}
+                >
                   {/* none, low to high , high to low  */}
-                  {option.name} 
+                  {option.name}
                 </button>
               ))}
             </DropdownMenuContent>
@@ -142,7 +154,7 @@ export default function Home() {
       <section className="pt-10 pb-24 ">
         {/* FILTER GRID */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-          {/* Filters */}
+          {/* SUBCATEGORIES FILTER*/}
           <div className="hidden lg:block">
             <ul className="space-y-4 border-b border-gray-400 pb-6 text-sm font-medium text-gray-900">
               {SUBCATEGORIES.map((category) => (
@@ -158,10 +170,10 @@ export default function Home() {
             </ul>
 
             <Accordion type="multiple" className="animate-none">
-              {/* Color Filter */}
+              {/* COLOR FILTER */}
               <AccordionItem value="color">
                 <AccordionTrigger className="py-3 text-sm text-gray-400 hover:text-gray-500">
-                  <span className="font-medium text-gray-900"> Color </span>
+                  <span className="font-medium text-gray-900"> COLOR </span>
                 </AccordionTrigger>
                 <AccordionContent className="pt-6 animate-none">
                   <ul className="space-y-4">
@@ -181,6 +193,38 @@ export default function Home() {
                         />
                         <label
                           htmlFor={`color-${optionIdx}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          {option.label}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="size">
+                <AccordionTrigger className="py-3 text-sm text-gray-400 hover:text-gray-500">
+                  <span className="font-medium text-gray-900"> SIZE </span>
+                </AccordionTrigger>
+                <AccordionContent className="pt-6 animate-none">
+                  <ul className="space-y-4">
+                    {SIZE_FILTERS.options.map((option, optionIdx) => (
+                      <li key={option.value} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`size-${optionIdx}`}
+                          checked={filter.size.includes(option.value)}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          onChange={() => {
+                            applyArrayFilter({
+                              category: "size",
+                              value: option.value,
+                            });
+                          }}
+                        />
+                        <label
+                          htmlFor={`size-${optionIdx}`}
                           className="ml-3 text-sm text-gray-600"
                         >
                           {option.label}
