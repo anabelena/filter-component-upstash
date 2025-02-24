@@ -18,12 +18,13 @@ import ProductSkeleton from "@/components/Products/ProductSkeleton";
 import { ProductState } from "@/lib/validators/product-validator";
 import { useState } from "react";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
 import type { Product as TProduct } from "@/db";
 import { cn } from "@/lib/utils";
 
 import { ChevronDown, Filter } from "lucide-react";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -60,6 +61,17 @@ const SIZE_FILTERS = {
   ],
 } as const;
 
+const PRICE_FILTERS = {
+  id: "price",
+  name: "Price",
+  options: [
+    { value: [0, 100], label: "Any price" },
+    { value: [0, 20], label: "Under 20 CAD " },
+    { value: [0, 40], label: "Under 40 CAD " },
+    // Custon option defined in JSX
+  ],
+} as const;
+
 const DEFAULT_CUSTOM_PRICE = [0, 100] as [number, number];
 
 export default function Home() {
@@ -69,6 +81,8 @@ export default function Home() {
     sort: "none",
     price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE },
   });
+
+  console.log("Filter State", filter);
 
   // Reading Data
   const { data: products } = useQuery({
@@ -86,8 +100,13 @@ export default function Home() {
     },
   });
 
-  const applyArrayFilter = ({category,value}: {category: keyof Omit<typeof filter, "price" | "sort">,value: string}) => {
-  
+  const applyArrayFilter = ({
+    category,
+    value,
+  }: {
+    category: keyof Omit<typeof filter, "price" | "sort">;
+    value: string;
+  }) => {
     // True if exist in filter, false if needs to be added
     const isFilterApplied = filter[category].includes(value as never);
 
@@ -98,7 +117,7 @@ export default function Home() {
         [category]: prev[category].filter((v) => v !== value),
       }));
     } else {
-    // add category/VALUE
+      // add category/VALUE
       setFilter((prev) => ({
         ...prev,
         [category]: [...prev[category], value],
@@ -220,6 +239,45 @@ export default function Home() {
                         />
                         <label
                           htmlFor={`size-${optionIdx}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          {option.label}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="price">
+                <AccordionTrigger className="py-3 text-sm text-gray-400 hover:text-gray-500">
+                  <span className="font-medium text-gray-900"> PRICE </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ul className="space-y-4">
+                    {PRICE_FILTERS.options.map((option, optionIdx) => (
+                      <li key={option.label} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`price-${optionIdx}`}
+                          checked={
+                            !filter.price.isCostum &&
+                            filter.price.range[0] === option.value[0] &&
+                            filter.price.range[1] === option.value[1]
+                          }
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          onChange={() => {
+                            setFilter((prev) => ({
+                              ...prev,
+                              price: {
+                                isCostum: false,
+                                range: [...option.value],
+                              },
+                            }));
+                          }}
+                        />
+                        <label
+                          htmlFor={`price-${optionIdx}`}
                           className="ml-3 text-sm text-gray-600"
                         >
                           {option.label}
