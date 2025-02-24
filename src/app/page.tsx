@@ -24,7 +24,6 @@ import type { Product as TProduct } from "@/db";
 import { cn } from "@/lib/utils";
 
 import { ChevronDown, Filter } from "lucide-react";
-import { Label } from "@radix-ui/react-dropdown-menu";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -71,9 +70,7 @@ export default function Home() {
     price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE },
   });
 
-  console.log("Filter useState", filter);
-
-  // READING DATA
+  // Reading Data
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -89,21 +86,19 @@ export default function Home() {
     },
   });
 
-  const applyArrayFilter = ({
-    category,
-    value,
-  }: {
-    category: keyof Omit<typeof filter, "price" | "sort">;
-    value: string;
-  }) => {
+  const applyArrayFilter = ({category,value}: {category: keyof Omit<typeof filter, "price" | "sort">,value: string}) => {
+  
+    // True if exist in filter, false if needs to be added
     const isFilterApplied = filter[category].includes(value as never);
 
+    // update category/VALUE
     if (isFilterApplied) {
       setFilter((prev) => ({
         ...prev,
         [category]: prev[category].filter((v) => v !== value),
       }));
     } else {
+    // add category/VALUE
       setFilter((prev) => ({
         ...prev,
         [category]: [...prev[category], value],
@@ -154,8 +149,8 @@ export default function Home() {
       <section className="pt-10 pb-24 ">
         {/* FILTER GRID */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-          {/* SUBCATEGORIES FILTER*/}
           <div className="hidden lg:block">
+            {/* SUBCATEGORIES FILTER*/}
             <ul className="space-y-4 border-b border-gray-400 pb-6 text-sm font-medium text-gray-900">
               {SUBCATEGORIES.map((category) => (
                 <li key={category.name}>
