@@ -24,7 +24,7 @@ import type { Product as TProduct } from "@/db";
 import { cn } from "@/lib/utils";
 
 import { ChevronDown, Filter } from "lucide-react";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Slider } from "@/components/ui/slider";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -84,6 +84,7 @@ export default function Home() {
 
   console.log("Filter State", filter);
 
+   
   // Reading Data
   const { data: products } = useQuery({
     queryKey: ["products"],
@@ -93,6 +94,9 @@ export default function Home() {
         {
           filter: {
             sort: filter.sort,
+            color: filter.color,
+            price: filter.price,
+            size: filter.size,
           },
         }
       );
@@ -124,6 +128,9 @@ export default function Home() {
       }));
     }
   };
+
+  const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
+  const maxPrice = Math.max(filter.price.range[0], filter.price.range[1]);
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -284,6 +291,70 @@ export default function Home() {
                         </label>
                       </li>
                     ))}
+                    <li className="flex justify-center flex-col gap-2">
+                      <div>
+                        <input
+                          type="radio"
+                          id={`price-${PRICE_FILTERS.options.length}`}
+                          checked={filter.price.isCostum}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          onChange={() => {
+                            setFilter((prev) => ({
+                              ...prev,
+                              price: {
+                                isCostum: true,
+                                range: [0, 100],
+                              },
+                            }));
+                          }}
+                        />
+                        <label
+                          htmlFor={`price-${PRICE_FILTERS.options.length}`}
+                          className="ml-3 text-sm text-gray-600"
+                        >
+                          Custom
+                        </label>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="font-medium"> Price </p>
+                        <div>
+                          {filter.price.isCostum
+                            ? minPrice.toFixed(0)
+                            : filter.price.range[0].toFixed(0)}{" "}
+                          CAD - {""}
+                          {filter.price.isCostum
+                            ? maxPrice.toFixed(0)
+                            : filter.price.range[1].toFixed(0)}{" "}
+                          CAD
+                        </div>
+                      </div>
+
+                      <Slider
+                        className={cn({
+                          "opacity-50": !filter.price.isCostum,
+                        })}
+                        disabled={!filter.price.isCostum}
+                        onValueChange={(range) => {
+                          const [newMin, newMax] = range;
+                          setFilter((prev) => ({
+                            ...prev,
+                            price: {
+                              isCostum: true,
+                              range: [newMin, newMax],
+                            },
+                          }));
+                        }}
+                        value={
+                          filter.price.isCostum
+                            ? filter.price.range
+                            : DEFAULT_CUSTOM_PRICE
+                        }
+                        min={DEFAULT_CUSTOM_PRICE[0]}
+                        defaultValue={DEFAULT_CUSTOM_PRICE}
+                        max={DEFAULT_CUSTOM_PRICE[1]}
+                        step={10}
+                      />
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>

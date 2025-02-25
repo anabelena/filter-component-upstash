@@ -7,11 +7,12 @@ const getRandomPrice = () => {
   const PRICES = [9.99, 19.99, 29.99, 39.99, 49.99]
   return PRICES[Math.floor(Math.random() * PRICES.length)]
 }
-
 const COLORS = ['white', 'beige', 'blue', 'green', 'purple'] as const
+
 const SIZES = ['S', 'M', 'L'] as const
 
 const seed = async () => {
+  
   const products: Product[] = []
 
   // 3 example products
