@@ -16,7 +16,7 @@ import {
 import Product from "@/components/Products/Product";
 import ProductSkeleton from "@/components/Products/ProductSkeleton";
 import { ProductState } from "@/lib/validators/product-validator";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
@@ -27,6 +27,8 @@ import { ChevronDown, Filter } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 import type { Product as TProduct } from "@/db";
+import debounce from "lodash.debounce";
+
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -86,7 +88,7 @@ export default function Home() {
 
   // const {data,isLoading,error} = useQuery({queryKey:["posts"],queryFn:fetchPosts})
   // destructuring and renaming data as products
-  const { data: products } = useQuery({
+  const { data: products, refetch } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data } = await axios.post<QueryResult<TProduct>[]>(
@@ -95,7 +97,7 @@ export default function Home() {
           filter: {
             sort: filter.sort,
             color: filter.color,
-            price: filter.price,
+            price: filter.price.range,
             size: filter.size,
           },
         }
@@ -103,6 +105,11 @@ export default function Home() {
       return data;
     },
   });
+
+   const onSubmit = () => refetch()
+
+   const debounceSubmit = debounce(onSubmit,400)
+   const _debounceSubmit = useCallback(debounceSubmit,[]) 
 
   const applyArrayFilter = ({
     category,
@@ -127,6 +134,9 @@ export default function Home() {
         [category]: [...prev[category], value],
       }));
     }
+
+    _debounceSubmit()
+
   };
 
   const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
@@ -157,8 +167,10 @@ export default function Home() {
                   })}
                   onClick={() => {
                     setFilter((prev) => ({ ...prev, sort: option.value }));
-                  }}
-                >
+                    
+                    _debounceSubmit()
+                  
+                  }}>
                   {/* none, low to high , high to low  */}
                   {option.name}
                 </button>
@@ -281,6 +293,7 @@ export default function Home() {
                                 range: [...option.value],
                               },
                             }));
+                            _debounceSubmit()
                           }}
                         />
                         <label
@@ -306,6 +319,7 @@ export default function Home() {
                                 range: [0, 100],
                               },
                             }));
+                            _debounceSubmit()
                           }}
                         />
                         <label
@@ -343,6 +357,7 @@ export default function Home() {
                               range: [newMin, newMax],
                             },
                           }));
+                          _debounceSubmit()
                         }}
                         value={
                           filter.price.isCostum
