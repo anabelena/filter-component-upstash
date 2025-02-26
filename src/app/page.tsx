@@ -18,13 +18,15 @@ import ProductSkeleton from "@/components/Products/ProductSkeleton";
 import { ProductState } from "@/lib/validators/product-validator";
 import { useState } from "react";
 import axios from "axios";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { QueryResult } from "@upstash/vector";
-import type { Product as TProduct } from "@/db";
+
 import { cn } from "@/lib/utils";
 
 import { ChevronDown, Filter } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+
+import type { Product as TProduct } from "@/db";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -82,10 +84,8 @@ export default function Home() {
     price: { isCostum: false, range: DEFAULT_CUSTOM_PRICE },
   });
 
-  console.log("Filter State", filter);
-
-   
-  // Reading Data
+  // const {data,isLoading,error} = useQuery({queryKey:["posts"],queryFn:fetchPosts})
+  // destructuring and renaming data as products
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
