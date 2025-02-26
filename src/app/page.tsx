@@ -28,7 +28,7 @@ import { Slider } from "@/components/ui/slider";
 
 import type { Product as TProduct } from "@/db";
 import debounce from "lodash.debounce";
-
+import EmptyState from "@/components/Products/EmptyState";
 
 const SORT_OPTIONS = [
   { name: "None", value: "none" },
@@ -106,10 +106,10 @@ export default function Home() {
     },
   });
 
-   const onSubmit = () => refetch()
+  const onSubmit = () => refetch();
 
-   const debounceSubmit = debounce(onSubmit,400)
-   const _debounceSubmit = useCallback(debounceSubmit,[]) 
+  const debounceSubmit = debounce(onSubmit, 400);
+  const _debounceSubmit = useCallback(debounceSubmit, []);
 
   const applyArrayFilter = ({
     category,
@@ -135,8 +135,7 @@ export default function Home() {
       }));
     }
 
-    _debounceSubmit()
-
+    _debounceSubmit();
   };
 
   const minPrice = Math.min(filter.price.range[0], filter.price.range[1]);
@@ -167,10 +166,10 @@ export default function Home() {
                   })}
                   onClick={() => {
                     setFilter((prev) => ({ ...prev, sort: option.value }));
-                    
-                    _debounceSubmit()
-                  
-                  }}>
+
+                    _debounceSubmit();
+                  }}
+                >
                   {/* none, low to high , high to low  */}
                   {option.name}
                 </button>
@@ -293,7 +292,7 @@ export default function Home() {
                                 range: [...option.value],
                               },
                             }));
-                            _debounceSubmit()
+                            _debounceSubmit();
                           }}
                         />
                         <label
@@ -319,7 +318,7 @@ export default function Home() {
                                 range: [0, 100],
                               },
                             }));
-                            _debounceSubmit()
+                            _debounceSubmit();
                           }}
                         />
                         <label
@@ -357,7 +356,7 @@ export default function Home() {
                               range: [newMin, newMax],
                             },
                           }));
-                          _debounceSubmit()
+                          _debounceSubmit();
                         }}
                         value={
                           filter.price.isCostum
@@ -378,13 +377,15 @@ export default function Home() {
 
           {/* PRODUCT Grid */}
           <ul className="grid grid-cols-1 gap-4 sm:gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3 ">
-            {products
-              ? products.map((item, index) => (
-                  <Product key={index} product={item.metadata!} />
-                ))
-              : Array.from({ length: 12 }, (_, i) => (
-                  <ProductSkeleton key={i} />
-                ))}
+            {products && products.length === 0 ? (
+              <EmptyState />
+            ) : products ? (
+              products.map((product) => <Product key={product.id} product={product.metadata!} />)
+            ) : (
+              new Array(12)
+                .fill(null)
+                .map((_, i) => <ProductSkeleton key={i} />)
+            )}
           </ul>
         </div>
       </section>
