@@ -1,5 +1,6 @@
 {
-  "name": "productfilters",
+  "name": "filter-component",
+  "author":"Belen Arista",
   "version": "0.1.0",
   "private": true,
   "scripts": {

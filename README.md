@@ -1,34 +1,69 @@
-## FlexFilterx
+# Filter Component with Next.js and Upstash
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-15-blue)
+![React](https://img.shields.io/badge/React-19-blue)
+![Tailwind](https://img.shields.io/badge/TailwindCSS-4-blue)
+![Upstash](https://img.shields.io/badge/Upstash-Redis-green)
+
+## Overview
+
+This project is a **filter component** built with **Next.js 15**, **React 19**, and **Tailwind CSS 4**, utilizing **Upstash Redis** for efficient state management and caching. It demonstrates an optimized approach to handling dynamic filters in an eCommerce setting.
+
+## Features
+
+✅ Built with **Next.js 15** for fast server-side rendering and API routes  
+✅ Uses **React 19** with modern features like **useOptimistic**  
+✅ Styled with **Tailwind CSS 4** for a clean and responsive UI  
+✅ Integrated **Upstash Redis** for fast and scalable filter caching  
+✅ Optimized for performance and minimal re-renders  
+
+## Screenshot
+
+![Filter Component](/public/screenshot.png)
+
+## Tech Stack
+
+- **Next.js 15** – SSR, ISR, and API routes  
+- **React 19** – Optimistic updates & Suspense  
+- **Tailwind CSS 4** – Modern styling approach  
+- **Upstash Redis** – Serverless database for caching  
+- **TypeScript** – Type safety and better development experience  
+
+## Installation & Usage
+
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/anabelena/filter-component-upstash.git
+cd filter-component-upstash
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install  # or npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Set Up Environment Variables
 
-## Learn More
+Create a `.env.local` file and add the following:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+UPSTASH_REDIS_REST_URL=your-upstash-redis-url
+UPSTASH_REDIS_REST_TOKEN=your-upstash-redis-token
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Run the Development Server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+yarn dev  # or npm run dev
+```
 
-## Deploy on Vercel
+Visit `http://localhost:3000` in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+---
+Made with ❤️ by [Ana Belena](https://github.com/anabelena)
